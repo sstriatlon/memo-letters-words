@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combinaciones Aleatorias</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #002b36; 
+            color: #839496; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .combination {
+            font-size: 48px; 
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #93a1a1; 
+        }
+
+        .word {
+            font-size: 36px;
+            color: #2aa198;
+            font-style: italic;
+            display: none; /* Inicialmente la palabra está oculta */
+        }
+
+        .delicate-underline {
+            text-decoration: underline;
+            text-decoration-color: #839496; 
+            text-decoration-thickness: 1px;
+            text-decoration-style: solid;
+        }
+
+        .combination:hover {
+            color: #b58900; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="combination" class="combination"></div>
+        <div id="word" class="word"></div>
+    </div>
+    <script>
+        // Datos simulados del Excel
+        const data = {
+    "A": { 
+        "B": "ABba", "C": "CArla", "D": "ADele", "E": "AblE", "F": "Anne Frank", "G": "Silver", "H": "AsH", "I": "Artificial Int", "J": "Angelina Jolie", 
+        "K": "AK-47", "L": "ALien", "M": "AMor", "N": "ANi", "O": "ArmOr", "P": "APp", "Q": "AQuaman", "R": "ARgentina", "S": "ASs", "T": "ATom", "U": "AUstralia", 
+        "V": "AVril Lavigne", "W": "ArroW", "Z": "AZteca"
+    },
+    "B": { 
+        "A": "ABba", "C": "Blood Castle", "D": "BeD", "E": "BackEnd", "F": "BiFe", "G": "BaGgette", "H": "BuHo", "I": "Bye", "J": "BlowJob", 
+        "K": "BiKini", "L": "BiLbo", "M": "BatMan", "N": "BaNana", "O": "BOob", "P": "BurPee", "Q": "BanQuete", "R": "BRazil", "S": "Britney Spears", "T": "BoTon", 
+        "U": "BUllet", "V": "BraVo", "W": "WB", "Z": "BayWatch"
+    },
+    "C": { 
+        "A": "CAt", "B": "CuBe", "D": "ChaD", "E": "CEnt", "F": "CoFfee", "G": "Coge", "H": "CHeese", "I": "CIne", "J": "CaJa", "K": "CoCa", 
+        "L": "ChiLe", "M": "CaMa", "N": "CaNa", "O": "COnan", "P": "CuP", "Q": "CaQoon", "R": "CRistina", "S": "CaSco", "T": "CaTalina", "U": "CUbo", 
+        "V": "Curriculum", "W": "CoW", "Z": "ChariZard"
+    },
+    "D": { 
+        "A": "DAd", "B": "DB", "C": "DesConected", "E": "DEer", "F": "DelFin", "G": "DoG", "H": "DHl", "I": "DeIdad", "J": "DJ", "K": "Dark Knight", 
+        "L": "Dua Lipa", "M": "Diamond", "N": "DuNe", "O": "DOor", "P": "DeadPool", "Q": "Don Quijote", "R": "DRagon", "S": "Devil Square", "T": "Donald Trump", 
+        "U": "DUck", "V": "DiVa", "W": "WD", "Z": "XD"
+    },
+    "E": {
+        "A": "yEAh", "B": "EBony", "C": "EClipse", "D": "EDison", "F": "EiFFel", "G": "EGg", "H": "EtHer", "I": "EInstein", "J": "Elton John",
+        "K": "Ekans", "L": "ELf", "M": "Elon Musk", "N": "ENt", "O": "Eco", "P": "Elvis Presley", "Q": "EarthQuake", "R": "Erno Rubik", "S": "Emma Stone",
+        "T": "ET", "U": "EUreka", "V": "EeVee", "W": "EWok", "Z": "EZ"
+    },
+    "F": {
+        "A": "FAce", "B": "FaceBook", "C": "FranCis", "D": "FooD", "E": "Front End", "G": "FroG", "H": "FisH", "I": "FIre", "J": "Mt FIji", 
+        "K": "FucK", "L": "FLequillo", "M": "FuMa", "N": "FuN", "O": "FOx", "P": "FootPrint", "Q": "Ficus", "R": "FouR", "S": "FoSSil", "T": "FeeT", 
+        "U": "FortUne cat", "V": "FiVe", "W": "FloWer", "Z": "FreeZer"
+    },
+    "G": {
+        "A": "AG", "B": "GoBlin", "C": "Glaciar Cascade", "D": "GoD", "E": "GEl", "F": "GirlFriend", "H": "GoHan", "I": "GIn", "J": "EuGenia", 
+        "K": "Genghis Khan", "L": "GLass", "M": "GoleM", "N": "GaNdalf", "O": "GOrilla", "P": "Golbin Points", "Q": "Goku", "R": "GuRu", "S": "GaS", 
+        "T": "GuiTar", "U": "GUs", "V": "GraVity", "W": "Gone Wild", "Z": "GodZilla"
+    },
+    "H": {
+        "A": "Harp", "B": "HoBbit", "C": "HardCore", "D": "High Definition", "E": "HE-man", "F": "Headphones", "G": "Hagrid", "I": "HippI", 
+        "J": "HandJob", "K": "HulK", "L": "HoLe", "M": "HaMMer", "N": "HorN", "O": "HOrse", "P": "Harry Potter", "Q": "Harley Quinn", "R": "HeRcules", 
+        "S": "Han Solo", "T": "HaT", "U": "HUmmus", "V": "HeaVy", "W": "HoWards", "Z": "HaZe"
+    },
+    "I": { 
+        "A": "dIA", "B": "IBu", "C": "ICe", "D": "ID", "E": "Internet Explorer", "F": "InFierno", "G": "IGuana", "H": "IncH", "J": "Indiana Jones", 
+        "K": "IKea", "L": "ILusion", "M": "IronMan", "N": "Indio", "O": "IrOn", "P": "IPhone", "Q": "IraQ", "R": "IRin", "S": "ISS", "T": "ITaly", 
+        "U": "IlUsion", "V": "IVasour", "W": "IoWa", "Z": "Icy"
+    },
+    "J": { 
+        "A": "Jessica Alba", "B": "JoB", "C": "Jack Cai", "D": "JaDe", "E": "JEep", "F": "JellyFish", "G": "JaGuar", "H": "JoHn", "I": "JedI", 
+        "K": "JoKer", "L": "Jennifer Lopez", "M": "JaMaica", "N": "JeaN", "O": "YOda", "P": "JaPan", "Q": "JamiroQuai", "R": "JunioR", "S": "JacaScript", 
+        "T": "JeT", "U": "Juli", "V": "Java", "W": "JeWel", "Z": "JynX"
+    },
+    "K": { 
+        "A": "KAyak", "B": "KeyBoard", "C": "KfC", "D": "KiDney", "E": "KEy", "F": "Kung Fu", "G": "KinG", "H": "KHaleesi", "I": "KI", "J": "Kahoot", 
+        "L": "KiLo", "M": "KiMono", "N": "KNee", "O": "KOala", "P": "KPop", "Q": "CocK", "R": "Kick", "S": "KiSS", "T": "KiTTen", 
+        "U": "KUdo", "V": "el KeVin", "W": "KiWi", "Z": "Kamikaze"
+    },
+    "L": { 
+        "A": "LAura", "B": "LuBe", "C": "LoCk", "D": "LaDy", "E": "Bruce LEE", "F": "LeaF", "G": "LuiGi", "H": "LocH", "I": "LIma", "J": "LiJa", 
+        "K": "LicK", "M": "Lionel Messi", "N": "LaNa", "O": "LegO", "P": "LuPa", "Q": "LiQuor", "R": "LyRa", "S": "LiSa", "T": "LoTo (flor)", 
+        "U": "LUciernaga", "V": "LaVa", "W": "Light Wizard", "Z": "LiZard"
+    },
+    "M": { 
+        "A": "MAy", "B": "MoB", "C": "MC donalds", "D": "MuD", "E": "MEme", "F": "MilF", "G": "Magic Gladiator", "H": "MoHo", "I": "MelI", "J": "Michael Jackson", 
+        "K": "MonK", "L": "MeLon", "N": "MooN", "O": "MagnetO", "P": "MaPa", "Q": "MosQuito", "R": "MeRmaid", "S": "MeSa", "T": "Mark Tyson", 
+        "U": "Moo", "V": "MarVel", "W": "MeW (pokemon)", "Z": "MaZe"
+    },
+    "N": { 
+        "A": "NAked", "B": "NooB", "C": "No Ce", "D": "NuDe", "E": "NEne", "F": "NetFlix", "G": "NiGeriano", "H": "NacHos", "I": "NIne", "J": "NinJa", 
+        "K": "NiKe", "L": "NoLan", "M": "NeMo", "O": "gNomO", "P": "NaPoleon", "Q": "NesQuik", "R": "NaRuto", "S": "NeSSie (lago ness)", 
+        "T": "NaTi", "U": "NUrse", "V": "NoVa", "W": "NorWay", "Z": "NaZi"
+    },
+    "O": { 
+        "A": "OAk", "B": "OBi-Wan", "C": "OCtopus", "D": "ODin", "E": "OnE", "F": "OFFice", "G": "Ogrimar", "H": "OcHo", "I": "RomI", "J": "OJota", 
+        "K": "OKebon", "L": "OLinda", "M": "rOMa", "N": "ONeill", "P": "OPera", "Q": "la Doq", "R": "ORca", "S": "OSama", "T": "OTTo", 
+        "U": "clOUD", "V": "dOVe", "W": "OWl", "Z": "OZZy"
+    },
+    "P": { 
+        "A": "PApa", "B": "PB", "C": "PC", "D": "PanDa", "E": "PEon", "F": "PerFume", "G": "PuG", "H": "PornHub", "I": "PI", "J": "Peter Jackson", 
+        "K": "PiKachu", "L": "PiLa", "M": "PaMela ", "N": "PaN", "O": "POe", "Q": "PorQue", "R": "PooR", "S": "PuSSy", "T": "PeTe", 
+        "U": "PUtin", "V": "PaVo", "W": "PassWord", "Z": "PiZZa"
+    },
+    "Q": { 
+        "A": "QA", "B": "QueBec", "C": "Quant Computer", "D": "QuesaDilla", "E": "QuEEn", "F": "QuiroFano", "G": "CHeGGins", "H": "QuincHo", "I": "Quinto", 
+        "J": "QueJa", "K": "QuaKer", "L": "CuLo", "M": "QuantuM", "N": "QuiNoa", "O": "QuOte", "P": "CuPido", "R": "QR", "S": "QueSo", 
+        "T": "QuiT", "U": "QUeue", "V": "QuiVer", "W": "QWerty", "Z": "QuartZ"
+    },
+    "R": { 
+        "A": "RAin", "B": "RuBy", "C": "RaChel", "D": "ReD", "E": "REmbrandt", "F": "Rage Fighter", "G": "RinG", "H": "RHoa", "I": "RomI", "J": "la RioJa", 
+        "K": "RicK sanchez", "L": "RaLLy", "M": "ReMo", "N": "RaiN", "O": "RObot", "P": "RiP", "Q": "RayQuaza (Pokemon)", "S": "RoSS", 
+        "T": "RaT", "U": "RUssia", "V": "RiVer", "W": "RainboW", "Z": "RaZor"
+    },
+    "S": { 
+        "A": "SAd", "B": "SuBway", "C": "SCorpion", "D": "SeeD", "E": "SEa", "F": "SoFa", "G": "SuGar", "H": "SHeldon", "I": "SIa", "J": "Steve Jobs", 
+        "K": "SpocK", "L": "SaLad", "M": "SaM", "N": "SaNd", "O": "SOfi", "P": "SoPa", "Q": "SQuirtle", "R": "SiRi", "T": "STar", 
+        "U": "SUn", "V": "SVelte", "W": "SWord", "Z": "Sub Zero"
+    },
+    "T": { 
+        "A": "TAble", "B": "TaBano", "C": "TaCo", "D": "TeD", "E": "TEa", "F": "ToFu", "G": "TiGre", "H": "THanos", "I": "TInder", "J": "TiJera", 
+        "K": "TanK", "L": "TaiL", "M": "ToMate", "N": "TNt", "O": "TOTO", "P": "TelePort", "Q": "TeQuila", "R": "TRon", "S": "TeSla", 
+        "U": "TUcan", "V": "TV", "W": "TWins", "Z": "TarZan"
+    },
+    "U": {
+        "A": "UsA", "B": "UBuntu", "C": "UniCorn", "D": "UnDo", "E": "blUE", "F": "UFo", "G": "UruGuay", "H": "dUcHa", "I": "UI", "J": "oUiJa",
+        "K": "UK", "L": "UmbreLLa", "M": "UMami", "N": "UNicorn", "O": "UnO", "P": "PU", "Q": "QU", "R": "URna", "S": "US", "T": "yoUTube",
+        "V": "UltraViolet", "W": "UnderWear", "Z": "bUZo"
+    },
+    "V": {
+        "A": "VA", "B": "ViBrator", "C": "ViCtoria", "D": "VooDoo", "E": "VEla", "F": "Veri-Fuel", "G": "VeGeta", "H": "VeHicle", "I": "VIolin",
+        "J": "ValiJa", "K": "VodKa", "L": "VeLcro", "M": "Virtual Machine", "N": "VaNs", "O": "VOlley", "P": "ViPer", "Q": "VaQuero", "R": "VaRa",
+        "S": "ViSa", "T": "VoTo", "U": "Vulcan", "W": "VolksWagen", "Z": "VeneZuela"
+    },
+    "W": {
+        "A": "WAlter", "B": "WasaBi", "C": "WebCoin", "D": "WeeD", "E": "WEon", "F": "WaFFle", "G": "WinGs", "H": "WHeel", "I": "WIg", "J": "WidJet",
+        "K": "WeeK", "L": "WiLson", "M": "WaterMelon", "N": "WiNe", "O": "WOw", "P": "WeaPon", "Q": "West", "R": "WR", "S": "Web Service",
+        "T": "WhiTe", "U": "WoUnd", "V": "WolVerine", "Z": "WiZard"
+    },
+    "Z": {
+        "A": "ZAza", "B": "ZeBra", "C": "ZuCcini", "D": "ZoD", "E": "ZEbra", "F": "ZaFiro", "G": "ZiG zag", "H": "ZanaHoria", "I": "ZIp", "J": "ZanJa",
+        "K": "ZaiKan", "L": "ZeLda", "M": "ZoMbie", "N": "ZeN", "O": "ZOrro", "P": "ZaPdos (pokemon)", "Q": "QuiZ", "R": "ZeRo", "S": "ZeuS",
+        "T": "ZeTa", "U": "ZUrdo", "V": "XaVier", "W": "ZimbaWe"
+    }
+};
+            
+function getRandomCombination() {
+            const rowKeys = Object.keys(data);
+            const colKeys = Object.keys(data[rowKeys[0]]);
+            let word = "";
+            let randomRow, randomCol;
+
+            do {
+                randomRow = rowKeys[Math.floor(Math.random() * rowKeys.length)];
+                randomCol = colKeys[Math.floor(Math.random() * colKeys.length)];
+                word = data[randomRow][randomCol];
+            } while (word.length < 3);
+
+            return { combination: randomRow + randomCol, word: word };
+        }
+
+        let currentCombination = getRandomCombination();
+        let showWord = false; 
+
+        function applyDelicateUnderline(combination) {
+            const secondLetter = combination.charAt(1);
+            const delicateLetters = ["C", "W", "I", "S"];
+            return delicateLetters.includes(secondLetter);
+        }
+
+        // Mostrar la combinación inicial
+        document.getElementById("combination").textContent = currentCombination.combination;
+        
+        const combinationElement = document.getElementById("combination");
+        if (applyDelicateUnderline(currentCombination.combination)) {
+            const secondLetterIndex = 1; 
+            combinationElement.innerHTML = currentCombination.combination.substring(0, secondLetterIndex) +
+                `<span class="delicate-underline">${currentCombination.combination.charAt(secondLetterIndex)}</span>` +
+                currentCombination.combination.substring(secondLetterIndex + 1);
+        }
+        document.addEventListener("keydown", function(event) {
+            if (event.key === " ") {
+                handleCombinationChange();
+            }
+        });
+
+        // evento para mobiles
+        let touchStart = false;
+        document.body.addEventListener("touchstart", function() {
+            touchStart = true;  // Registro el toque inicial
+        });
+
+        document.body.addEventListener("touchend", function() {
+            if (touchStart) {
+                handleCombinationChange();
+                touchStart = false;  
+            }
+        });
+
+        function handleCombinationChange() {
+            if (!showWord) {
+                document.getElementById("word").textContent = currentCombination.word;
+                document.getElementById("word").style.display = "block";
+                showWord = true;
+            } else {
+                currentCombination = getRandomCombination();
+                document.getElementById("combination").textContent = currentCombination.combination;
+                
+                if (applyDelicateUnderline(currentCombination.combination)) {
+                    const secondLetterIndex = 1;
+                    combinationElement.innerHTML = currentCombination.combination.substring(0, secondLetterIndex) +
+                        `<span class="delicate-underline">${currentCombination.combination.charAt(secondLetterIndex)}</span>` +
+                        currentCombination.combination.substring(secondLetterIndex + 1);
+                } else {
+                    combinationElement.innerHTML = currentCombination.combination;
+                }
+
+                document.getElementById("word").style.display = "none";
+                showWord = false;
+            }
+        }
+    </script>
+</body>
+</html>
